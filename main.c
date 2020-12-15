@@ -14,14 +14,17 @@ void printPGM(int n, int m,int max,unsigned char **a,char* out){
 			for(int j=0;j<m;j++)
 			{
 				tmp = ((unsigned char**)a)[i][j];
-				putchar(tmp == 0?' ':(max/tmp>5?'.':(max/tmp>4?',':(max/tmp>3?'i':(max/tmp>2?'1':((max/tmp)>1?'8':(unsigned char)(209)))))));
+				for(int k=0;k<2;k++)
+				putchar(tmp == 0?' ':(max/tmp>4?'.':(max/tmp>3?',':
+					((float)max/tmp>2.6?'i':((float)max/tmp>2.2?'8':
+					(((float)max/tmp)>1.9?'M':(unsigned char)(219)))))));
 			}
 		putchar('\n');
 		}
 	}
 	else{
 		FILE *fo = fopen(out,"w");
-		fprintf(fo,"PG5 ");
+		fprintf(fo,"P5\n");
 		fprintf(fo,"%i ",n);
 		fprintf(fo,"%i\n",m);
 		fprintf(fo,"%i\n",max);
@@ -40,6 +43,7 @@ unsigned char** readPGM(char* in,int *n,int *m,int *max){
 		printf("Error\n");	
 		return 0;
 	}
+	int mn = 10000, mx = 0;
 	char title[4];
 	for(int i=0;i<3;i++)
 		title[i] = (char)fgetc(fi);
@@ -51,17 +55,24 @@ unsigned char** readPGM(char* in,int *n,int *m,int *max){
 		a[i] = (unsigned char*) malloc((*m) * sizeof(unsigned char));
 		for(int j=0;j<*m;j++){
 			a[i][j] = (char)fgetc(fi);
+			if(mn >a[i][j]) mn = a[i][j];
+			if(mx <a[i][j]) mx = a[i][j];
 		}
-		if(i%5)printf("%i\n",100*i/(*n));
 	}
+
+	for(int i=0;i<*n;i++)
+		for(int j=0;j<*m;j++)
+			a[i][j] -= mn;
+	*max = mx-mn;
 	return a;
 }
 
 int main()
 {
+	char source[15];
 	int n,m,max;
-	unsigned char **a = readPGM("niki.pgm",&n,&m,&max);
+	scanf("%s", source);
+	unsigned char **a = readPGM(source,&n,&m,&max);
 	printPGM(n,m,max,a,0);
-	printf("Hello World!\n");
 	return 0;
 }
